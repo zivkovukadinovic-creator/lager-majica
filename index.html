@@ -1,0 +1,550 @@
+
+<!DOCTYPE html>
+<html lang="bs">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lager majica</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 16px;
+      font-family: Arial, sans-serif;
+      background: #f1f5f9;
+      color: #172033;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      text-align: center;
+      color: #17365d;
+      margin-bottom: 8px;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #64748b;
+      margin-bottom: 24px;
+    }
+
+    .panel {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 8px #0000000d;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    label {
+      display: block;
+      font-size: 14px;
+      font-weight: bold;
+      margin-bottom: 6px;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #cbd5e1;
+      border-radius: 7px;
+      font-size: 16px;
+    }
+
+    button {
+      padding: 11px 15px;
+      border: none;
+      border-radius: 7px;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .primary {
+      background: #1769aa;
+      color: white;
+    }
+
+    .secondary {
+      background: #e2e8f0;
+      color: #172033;
+    }
+
+    .danger {
+      background: #dc2626;
+      color: white;
+    }
+
+    .actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 16px;
+    }
+
+    .search {
+      margin-bottom: 15px;
+    }
+
+    .summary {
+      font-size: 17px;
+      font-weight: bold;
+      margin-bottom: 15px;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+    }
+
+    th, td {
+      padding: 12px 10px;
+      border-bottom: 1px solid #e2e8f0;
+      text-align: left;
+    }
+
+    th {
+      background: #edf2f7;
+      white-space: nowrap;
+    }
+
+    td {
+      overflow-wrap: anywhere;
+    }
+
+    .quantity {
+      font-weight: bold;
+      font-size: 17px;
+    }
+
+    #status {
+      padding: 12px;
+      margin-bottom: 16px;
+      border-radius: 7px;
+      background: #e2e8f0;
+      overflow-wrap: anywhere;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .small-actions {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    @media (max-width: 600px) {
+      body {
+        padding: 10px;
+      }
+
+      .panel {
+        padding: 14px;
+      }
+
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+
+      th, td {
+        padding: 9px 7px;
+        font-size: 13px;
+      }
+
+      button {
+        padding: 10px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+<div class="container">
+
+  <h1>LAGER MAJICA</h1>
+  <p class="subtitle">Evidencija stanja i količina</p>
+
+  <div id="status">Potrebno je podesiti vezu sa bazom.</div>
+
+  <section class="panel">
+    <h2 id="formTitle">Dodaj majice na lager</h2>
+
+    <form id="shirtForm">
+      <div class="form-grid">
+
+        <div>
+          <label for="model">Model majice</label>
+          <input id="model" type="text"
+                 placeholder="Npr. Basic" required>
+        </div>
+
+        <div>
+          <label for="boja">Boja</label>
+          <input id="boja" type="text"
+                 placeholder="Npr. Crna" required>
+        </div>
+
+        <div>
+          <label for="velicina">Veličina</label>
+          <input id="velicina" type="text"
+                 placeholder="Npr. M, L, XL" required>
+        </div>
+
+        <div>
+          <label for="kolicina">Količina</label>
+          <input id="kolicina" type="number"
+                 min="0" step="1" value="0" required>
+        </div>
+
+      </div>
+
+      <div class="actions">
+        <button class="primary" type="submit" id="saveBtn">
+          Sačuvaj majice
+        </button>
+
+        <button class="secondary hidden"
+                type="button" id="cancelBtn">
+          Odustani od izmjene
+        </button>
+      </div>
+    </form>
+  </section>
+
+  <section class="panel">
+    <h2>Stanje lagera</h2>
+
+    <div class="summary" id="summary">
+      Ukupno majica: 0
+    </div>
+
+    <input class="search" id="search"
+           type="search"
+           placeholder="Pretraži model, boju ili veličinu...">
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Model</th>
+            <th>Boja</th>
+            <th>Veličina</th>
+            <th>Količina</th>
+            <th>Akcije</th>
+          </tr>
+        </thead>
+
+        <tbody id="shirtList">
+          <tr>
+            <td colspan="5">Podaci još nisu učitani.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+</div>
+
+<script>
+  // ==========================================
+  // PODESI OVA DVA PODATKA ZA SUPABASE
+  // ==========================================
+
+  const SUPABASE_URL = "OVDJE_UNESI_PROJECT_URL";
+  const SUPABASE_ANON_KEY = "OVDJE_UNESI_PUBLISHABLE_KEY";
+
+  // Naziv postojeće tabele u tvojoj bazi.
+  const TABLE_NAME = "majice";
+
+  let db = null;
+  let shirts = [];
+  let editingId = null;
+  let loading = false;
+
+  const form = document.getElementById("shirtForm");
+  const modelInput = document.getElementById("model");
+  const bojaInput = document.getElementById("boja");
+  const velicinaInput = document.getElementById("velicina");
+  const kolicinaInput = document.getElementById("kolicina");
+  const shirtList = document.getElementById("shirtList");
+  const searchInput = document.getElementById("search");
+  const statusBox = document.getElementById("status");
+  const saveBtn = document.getElementById("saveBtn");
+  const cancelBtn = document.getElementById("cancelBtn");
+
+  function setStatus(message) {
+    statusBox.textContent = message;
+  }
+
+  function escapeHtml(value) {
+    return String(value ?? "").replace(/[&<>"']/g, char => ({
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': "&quot;",
+      "'": "&#039;"
+    })[char]);
+  }
+
+  function validConfiguration() {
+    return SUPABASE_URL.startsWith("https://") &&
+      !SUPABASE_URL.includes("OVDJE_UNESI") &&
+      SUPABASE_ANON_KEY.length > 10 &&
+      !SUPABASE_ANON_KEY.includes("OVDJE_UNESI");
+  }
+
+  async function loadShirts() {
+    if (!db || loading) return;
+
+    loading = true;
+    setStatus("Učitavam podatke iz online baze...");
+
+    try {
+      const { data, error } = await db
+        .from(TABLE_NAME)
+        .select("id, model, boja, velicina, kolicina")
+        .order("model", { ascending: true });
+
+      if (error) throw error;
+
+      shirts = data || [];
+      renderShirts();
+
+      setStatus("Podaci su učitani iz online baze.");
+    } catch (error) {
+      setStatus("Greška pri učitavanju: " + error.message);
+    } finally {
+      loading = false;
+    }
+  }
+
+  function renderShirts() {
+    const query = searchInput.value.trim().toLowerCase();
+
+    const filtered = shirts.filter(item =>
+      [item.model, item.boja, item.velicina]
+        .some(value => String(value ?? "")
+          .toLowerCase().includes(query))
+    );
+
+    const total = shirts.reduce(
+      (sum, item) => sum + Number(item.kolicina || 0), 0
+    );
+
+    document.getElementById("summary").textContent =
+      "Ukupno majica: " + total +
+      " | Broj različitih stavki: " + shirts.length;
+
+    if (filtered.length === 0) {
+      shirtList.innerHTML =
+        '<tr><td colspan="5">Nema pronađenih majica.</td></tr>';
+      return;
+    }
+
+    shirtList.innerHTML = filtered.map(item => `
+      <tr>
+        <td>${escapeHtml(item.model)}</td>
+        <td>${escapeHtml(item.boja)}</td>
+        <td>${escapeHtml(item.velicina)}</td>
+        <td class="quantity">${Number(item.kolicina)}</td>
+        <td>
+          <div class="small-actions">
+            <button class="primary"
+              data-action="edit"
+              data-id="${escapeHtml(item.id)}">
+              Izmijeni
+            </button>
+            <button class="danger"
+              data-action="delete"
+              data-id="${escapeHtml(item.id)}">
+              Obriši
+            </button>
+          </div>
+        </td>
+      </tr>
+    `).join("");
+  }
+
+  function resetForm() {
+    form.reset();
+    kolicinaInput.value = "0";
+    editingId = null;
+    document.getElementById("formTitle").textContent =
+      "Dodaj majice na lager";
+    saveBtn.textContent = "Sačuvaj majice";
+    cancelBtn.classList.add("hidden");
+  }
+
+  form.addEventListener("submit", async event => {
+    event.preventDefault();
+
+    if (!db) {
+      setStatus("Prvo podesi vezu sa Supabase bazom.");
+      return;
+    }
+
+    const model = modelInput.value.trim();
+    const boja = bojaInput.value.trim();
+    const velicina = velicinaInput.value.trim();
+    const kolicina = Number(kolicinaInput.value);
+
+    if (!model || !boja || !velicina) {
+      setStatus("Popuni sva polja.");
+      return;
+    }
+
+    if (!Number.isSafeInteger(kolicina) || kolicina < 0) {
+      setStatus("Količina mora biti cijeli broj od nule naviše.");
+      return;
+    }
+
+    const payload = { model, boja, velicina, kolicina };
+
+    saveBtn.disabled = true;
+
+    try {
+      let result;
+
+      if (editingId !== null) {
+        result = await db
+          .from(TABLE_NAME)
+          .update(payload)
+          .eq("id", editingId)
+          .select("id");
+      } else {
+        result = await db
+          .from(TABLE_NAME)
+          .insert(payload)
+          .select("id");
+      }
+
+      if (result.error) throw result.error;
+
+      if (!result.data || result.data.length === 0) {
+        throw new Error(
+          "Baza nije potvrdila izmjenu. Provjeri dozvole pristupa."
+        );
+      }
+
+      resetForm();
+      await loadShirts();
+
+      setStatus("Podaci su uspješno sačuvani u online bazi.");
+    } catch (error) {
+      setStatus("Greška pri čuvanju: " + error.message);
+    } finally {
+      saveBtn.disabled = false;
+    }
+  });
+
+  shirtList.addEventListener("click", async event => {
+    const button = event.target.closest("button[data-action]");
+    if (!button || !db) return;
+
+    const id = button.dataset.id;
+    const action = button.dataset.action;
+
+    const item = shirts.find(
+      shirt => String(shirt.id) === String(id)
+    );
+
+    if (!item) return;
+
+    if (action === "edit") {
+      editingId = item.id;
+      modelInput.value = item.model;
+      bojaInput.value = item.boja;
+      velicinaInput.value = item.velicina;
+      kolicinaInput.value = item.kolicina;
+
+      document.getElementById("formTitle").textContent =
+        "Izmijeni podatke o majicama";
+      saveBtn.textContent = "Sačuvaj izmjene";
+      cancelBtn.classList.remove("hidden");
+
+      form.scrollIntoView({ behavior: "smooth" });
+    }
+
+    if (action === "delete") {
+      const confirmed = confirm(
+        "Da li sigurno želiš obrisati ovu stavku lagera?"
+      );
+
+      if (!confirmed) return;
+
+      button.disabled = true;
+
+      try {
+        const { data, error } = await db
+          .from(TABLE_NAME)
+          .delete()
+          .eq("id", item.id)
+          .select("id");
+
+        if (error) throw error;
+
+        if (!data || data.length === 0) {
+          throw new Error(
+            "Brisanje nije potvrđeno. Provjeri dozvole pristupa."
+          );
+        }
+
+        if (String(editingId) === String(item.id)) {
+          resetForm();
+        }
+
+        await loadShirts();
+        setStatus("Stavka je obrisana iz online baze.");
+      } catch (error) {
+        setStatus("Greška pri brisanju: " + error.message);
+      } finally {
+        button.disabled = false;
+      }
+    }
+  });
+
+  cancelBtn.addEventListener("click", resetForm);
+  searchInput.addEventListener("input", renderShirts);
+
+  if (validConfiguration()) {
+    try {
+      db = window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_ANON_KEY
+      );
+      loadShirts();
+    } catch (error) {
+      setStatus("Greška pri povezivanju: " + error.message);
+    }
+  } else {
+    setStatus(
+      "Aplikacija je pripremljena. Unesi URL projekta i " +
+      "publishable ključ iz Supabase postavki."
+    );
+  }
+</script>
+</body>
+</html>
