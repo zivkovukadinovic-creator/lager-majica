@@ -445,11 +445,14 @@
 
       if (result.error) throw result.error;
 
-      if (!result.data || result.data.length === 0) {
-        throw new Error(
-          "Baza nije potvrdila izmjenu. Provjeri dozvole pristupa."
-        );
-      }
+if (
+  editingId !== null &&
+  (!result.data || result.data.length === 0)
+) {
+  throw new Error(
+    "Baza nije potvrdila izmjenu. Provjeri dozvole pristupa."
+  );
+}
 
       resetForm();
       await loadShirts();
