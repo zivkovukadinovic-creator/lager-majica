@@ -434,12 +434,14 @@
           .update(payload)
           .eq("id", editingId)
           .select("id");
-      } else {
-        result = await db
-          .from(TABLE_NAME)
-          .insert(payload)
-          .select("id");
-      }
+} else {
+  result = await db.rpc("dodaj_majice", {
+    p_model: model,
+    p_boja: boja,
+    p_velicina: velicina,
+    p_kolicina: kolicina
+  });
+}
 
       if (result.error) throw result.error;
 
