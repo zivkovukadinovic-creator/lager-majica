@@ -197,14 +197,13 @@ td {
      <div class="actions">
       <button class="primary" id="authSubmit" type="submit">
        Prijavi se
-      </button>
-      <button class="secondary" id="toggleAuth" type="button">
-       Napravi nalog
+      <button class="secondary hidden" id="toggleAuth" type="button">
+      Napravi nalog
       </button>
      </div>
     </form>
     <p class="muted" id="authHint">
-     Prijavi se postojećim nalogom ili napravi novi.
+    Prijavi se postojećim nalogom.
     </p>
    </section>
    <div class="hidden" id="app">
@@ -388,14 +387,13 @@ async function applySession(session){
   }
 }
 function showAuthMode(){
-  const register=authMode==="register";
-  $("authTitle").textContent=register?"Registracija korisnika":"Prijava korisnika";
-  $("authSubmit").textContent=register?"Registruj se":"Prijavi se";
-  $("toggleAuth").textContent=register?"Već imam nalog":"Napravi nalog";
-  $("password").autocomplete=register?"new-password":"current-password";
-  $("authHint").textContent=register?"Ako je potvrda e-maila uključena, potvrdi adresu putem poruke koju dobiješ.":"Prijavi se postojećim nalogom ili napravi novi."
+  authMode = "login";
+  $("authTitle").textContent = "Prijava korisnika";
+  $("authSubmit").textContent = "Prijavi se";
+  $("toggleAuth").classList.add("hidden");
+  $("password").autocomplete = "current-password";
+  $("authHint").textContent = "Prijavi se postojećim nalogom.";
 }
-$("toggleAuth").addEventListener("click",()=>{authMode=authMode==="login"?"register":"login";showAuthMode();setStatus(authMode==="register"?"Unesi podatke za novi nalog.":"Unesi podatke za prijavu.")});
 $("authForm").addEventListener("submit",async event=>{event.preventDefault();if(!db)return;const email=$("email").value.trim(),password=$("password").value,register=authMode==="register";$("authSubmit").disabled=true;try{if(register){const {data,error}=await db.auth.signUp({email,password});if(error)throw error;if(data.session){await applySession(data.session)}else{setStatus("Zahtjev za registraciju je primljen. Ako je potrebna potvrda e-maila, provjeri poštu, a zatim se prijavi.");authMode="login";showAuthMode()}}else{const {data,error}=await db.auth.signInWithPassword({email,password});if(error)throw error;await applySession(data.session)}$("password").value=""}catch(error){setStatus("Greška pri "+(register?"registraciji":"prijavi")+": "+error.message)}finally{$("authSubmit").disabled=false}});
    
 
