@@ -397,7 +397,21 @@ function showAuthMode(){
 }
 $("toggleAuth").addEventListener("click",()=>{authMode=authMode==="login"?"register":"login";showAuthMode();setStatus(authMode==="register"?"Unesi podatke za novi nalog.":"Unesi podatke za prijavu.")});
 $("authForm").addEventListener("submit",async event=>{event.preventDefault();if(!db)return;const email=$("email").value.trim(),password=$("password").value,register=authMode==="register";$("authSubmit").disabled=true;try{if(register){const {data,error}=await db.auth.signUp({email,password});if(error)throw error;if(data.session){await applySession(data.session)}else{setStatus("Zahtjev za registraciju je primljen. Ako je potrebna potvrda e-maila, provjeri poštu, a zatim se prijavi.");authMode="login";showAuthMode()}}else{const {data,error}=await db.auth.signInWithPassword({email,password});if(error)throw error;await applySession(data.session)}$("password").value=""}catch(error){setStatus("Greška pri "+(register?"registraciji":"prijavi")+": "+error.message)}finally{$("authSubmit").disabled=false}});
-$("logoutBtn").addEventListener("click",async()=>{const {error}=await db.auth.signOut();if(error)setStatus("Greška pri odjavi: "+error.message);else await applySession(null)});
+   
+
+$("logoutBtn").addEventListener("click", async () => {
+  const { error } = await db.auth.signOut();
+
+  if (error) {
+    setStatus("Greška pri odjavi: " + error.message);
+  } else {
+    $("email").value = "";
+    $("password").value = "";
+    await applySession(null);
+  }
+});
+
+   
 $("shirtForm").addEventListener("submit",async event=>{event.preventDefault();if(!db||!currentUser||!isEditor){setStatus("Nemaš pravo uređivanja lagera.");return}const model=$("model").value.trim(),boja=$("boja").value.trim(),velicina=$("velicina").value.trim(),kolicina=Number($("kolicina").value);if(!model||!boja||!velicina){setStatus("Popuni sva polja.");return}if(!Number.isSafeInteger(kolicina)||kolicina<0){setStatus("Količina mora biti cijeli broj od nule naviše.");return}$("saveBtn").disabled=true;try{let result;if(editingId!==null){result=await db.from(TABLE_NAME).update({model,boja,velicina,kolicina}).eq("id",editingId).select("id");if(!result.error&&(!result.data||!result.data.length))throw Error("Izmjena nije potvrđena. Provjeri dozvole pristupa.")}else{result=await db.rpc("dodaj_majice",{p_model:model,p_boja:boja,p_velicina:velicina,p_kolicina:kolicina})}if(result.error)throw result.error;resetForm();await loadShirts();setStatus("Podaci su uspješno sačuvani u online bazi.")}catch(error){setStatus("Greška pri čuvanju: "+error.message)}finally{$("saveBtn").disabled=false}});
 $("shirtList").addEventListener("click",async event=>{const button=event.target.closest("button[data-action]");if(!button||!db||!currentUser||!isEditor)return;const item=shirts.find(shirt=>String(shirt.id)===String(button.dataset.id));if(!item)return;if(button.dataset.action==="edit"){editingId=item.id;$("model").value=item.model;$("boja").value=item.boja;$("velicina").value=item.velicina;$("kolicina").value=item.kolicina;$("formTitle").textContent="Izmijeni podatke o majicama";$("saveBtn").textContent="Sačuvaj izmjene";$("cancelBtn").classList.remove("hidden");$("shirtForm").scrollIntoView({behavior:"smooth"})}else if(button.dataset.action==="delete"){if(!confirm("Da li sigurno želiš obrisati ovu stavku lagera?"))return;button.disabled=true;try{const {data,error}=await db.from(TABLE_NAME).delete().eq("id",item.id).select("id");if(error)throw error;if(!data||!data.length)throw Error("Brisanje nije potvrđeno. Provjeri dozvole pristupa.");if(String(editingId)===String(item.id))resetForm();await loadShirts();setStatus("Stavka je obrisana iz online baze.")}catch(error){setStatus("Greška pri brisanju: "+error.message)}finally{button.disabled=false}}});
 $("cancelBtn").addEventListener("click",resetForm);
