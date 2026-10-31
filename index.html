@@ -248,6 +248,24 @@ td {
         </label>
         <input id="kolicina" min="0" required="" step="1" type="number" value="0"/>
        </div>
+     
+<div>
+  <label for="kolicina">
+    Količina
+  </label>
+  <input id="kolicina" min="0" required="" step="1" type="number" value="0"/>
+</div>
+
+<div>
+  <label for="minimalna_kolicina">
+    Minimalna količina za upozorenje
+  </label>
+  <input id="minimalna_kolicina" min="0" required="" step="1" type="number" value="0"/>
+</div>
+
+</div>
+<div class="actions">
+
       </div>
       <div class="actions">
        <button class="primary" id="saveBtn" type="submit">
@@ -283,7 +301,13 @@ td {
          <th>
           Količina
          </th>
-         <th class="hidden" id="actionsHeader">
+        <th>
+          Minimum
+        </th>
+        <th>
+          Upozorenje
+        </th>
+        <th class="hidden" id="actionsHeader">
           Akcije
          </th>
         </tr>
@@ -298,6 +322,39 @@ td {
       </table>
      </div>
     </section>
+
+<section class="panel">
+  <h2>⚠ Majice za dopunu</h2>
+
+  <div class="summary" id="dopunaSummary">
+    Provjeravam stanje lagera...
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Model</th>
+          <th>Boja</th>
+          <th>Veličina</th>
+          <th>Količina</th>
+          <th>Minimum</th>
+          <th>Za dopuniti</th>
+        </tr>
+      </thead>
+
+      <tbody id="dopunaList">
+        <tr>
+          <td colspan="6">Podaci još nisu učitani.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+   
+   
+   
    </div>
   </div>
   <script>
@@ -319,18 +376,73 @@ function resetForm(){
   $("saveBtn").textContent="Sačuvaj majice";
   $("cancelBtn").classList.add("hidden")
 }
-function renderShirts(){
-  const query=$("search").value.trim().toLowerCase();
-  const filtered=shirts.filter(item=>[item.model,item.boja,item.velicina].some(value=>String(value??"").toLowerCase().includes(query)));
-  const total=shirts.reduce((sum,item)=>sum+Number(item.kolicina||0),0);
-  $("summary").textContent="Ukupno majica: "+total+" | Broj različitih stavki: "+shirts.length;
-  const columns=isEditor?5:4;
-  if(!filtered.length){
-    $("shirtList").innerHTML=`<tr><td colspan="${columns}">Nema pronađenih majica.</td></tr>`;
-    return
+
+function renderShirts() {
+  const query = $("search").value.trim().toLowerCase();
+
+  const filtered = shirts.filter(item =>
+    [item.model, item.boja, item.velicina].some(value =>
+      String(value ?? "").toLowerCase().includes(query)
+    )
+  );
+
+  const total = shirts.reduce(
+    (sum, item) => sum + Number(item.kolicina || 0), 0
+  );
+
+  const zaDopunu = shirts.filter(item =>
+    Number(item.minimalna_kolicina) > 0 &&
+    Number(item.kolicina) <= Number(item.minimalna_kolicina)
+  );
+
+  $("summary").textContent =
+    "Ukupno majica: " + total +
+    " | Broj različitih stavki: " + shirts.length +
+    " | Za dopunu: " + zaDopunu.length;
+
+  const columns = isEditor ? 7 : 6;
+
+  if (!filtered.length) {
+    $("shirtList").innerHTML =
+      `<tr><td colspan="${columns}">Nema pronađenih majica.</td></tr>`;
+    return;
   }
-  $("shirtList").innerHTML=filtered.map(item=>`<tr><td>${escapeHtml(item.model)}</td><td>${escapeHtml(item.boja)}</td><td>${escapeHtml(item.velicina)}</td><td class="quantity">${Number(item.kolicina)}</td>${isEditor?`<td><div class="small-actions"><button class="primary" data-action="edit" data-id="${escapeHtml(item.id)}">Izmijeni</button><button class="danger" data-action="delete" data-id="${escapeHtml(item.id)}">Obriši</button></div></td>`:""}</tr>`).join("")
+
+  $("shirtList").innerHTML = filtered.map(item => {
+    const kolicina = Number(item.kolicina);
+    const minimum = Number(item.minimalna_kolicina ?? 0);
+
+    const upozorenje = minimum > 0 && kolicina <= minimum;
+
+    const status = upozorenje
+      ? '<strong style="color:#dc2626;">⚠ POTREBNA DOPUNA</strong>'
+      : '<span style="color:#15803d;">U redu</span>';
+
+    return `
+      <tr style="${upozorenje ? 'background:#fef2f2;' : ''}">
+        <td>${escapeHtml(item.model)}</td>
+        <td>${escapeHtml(item.boja)}</td>
+        <td>${escapeHtml(item.velicina)}</td>
+        <td class="quantity">${kolicina}</td>
+        <td>${minimum}</td>
+        <td>${status}</td>
+        ${isEditor ? `
+          <td>
+            <div class="small-actions">
+              <button class="primary"
+                data-action="edit"
+                data-id="${escapeHtml(item.id)}">Izmijeni</button>
+              <button class="danger"
+                data-action="delete"
+                data-id="${escapeHtml(item.id)}">Obriši</button>
+            </div>
+          </td>
+        ` : ""}
+      </tr>
+    `;
+  }).join("");
 }
+
 async function loadShirts(){
   if(!db||!currentUser)return;
   const revision=sessionRevision;
@@ -339,7 +451,7 @@ async function loadShirts(){
     const {
       data,error
     }
-    =await db.from(TABLE_NAME).select("id, model, boja, velicina, kolicina").order("model",{ascending:true});
+    =await db.from(TABLE_NAME).select("id, model, boja, velicina, kolicina, minimalna_kolicina").order("model",{ascending:true});
     if(error)throw error;
     if(revision!==sessionRevision)return;
     shirts=data||[];
@@ -410,8 +522,81 @@ $("logoutBtn").addEventListener("click", async () => {
 });
 
    
-$("shirtForm").addEventListener("submit",async event=>{event.preventDefault();if(!db||!currentUser||!isEditor){setStatus("Nemaš pravo uređivanja lagera.");return}const model=$("model").value.trim(),boja=$("boja").value.trim(),velicina=$("velicina").value.trim(),kolicina=Number($("kolicina").value);if(!model||!boja||!velicina){setStatus("Popuni sva polja.");return}if(!Number.isSafeInteger(kolicina)||kolicina<0){setStatus("Količina mora biti cijeli broj od nule naviše.");return}$("saveBtn").disabled=true;try{let result;if(editingId!==null){result=await db.from(TABLE_NAME).update({model,boja,velicina,kolicina}).eq("id",editingId).select("id");if(!result.error&&(!result.data||!result.data.length))throw Error("Izmjena nije potvrđena. Provjeri dozvole pristupa.")}else{result=await db.rpc("dodaj_majice",{p_model:model,p_boja:boja,p_velicina:velicina,p_kolicina:kolicina})}if(result.error)throw result.error;resetForm();await loadShirts();setStatus("Podaci su uspješno sačuvani u online bazi.")}catch(error){setStatus("Greška pri čuvanju: "+error.message)}finally{$("saveBtn").disabled=false}});
-$("shirtList").addEventListener("click",async event=>{const button=event.target.closest("button[data-action]");if(!button||!db||!currentUser||!isEditor)return;const item=shirts.find(shirt=>String(shirt.id)===String(button.dataset.id));if(!item)return;if(button.dataset.action==="edit"){editingId=item.id;$("model").value=item.model;$("boja").value=item.boja;$("velicina").value=item.velicina;$("kolicina").value=item.kolicina;$("formTitle").textContent="Izmijeni podatke o majicama";$("saveBtn").textContent="Sačuvaj izmjene";$("cancelBtn").classList.remove("hidden");$("shirtForm").scrollIntoView({behavior:"smooth"})}else if(button.dataset.action==="delete"){if(!confirm("Da li sigurno želiš obrisati ovu stavku lagera?"))return;button.disabled=true;try{const {data,error}=await db.from(TABLE_NAME).delete().eq("id",item.id).select("id");if(error)throw error;if(!data||!data.length)throw Error("Brisanje nije potvrđeno. Provjeri dozvole pristupa.");if(String(editingId)===String(item.id))resetForm();await loadShirts();setStatus("Stavka je obrisana iz online baze.")}catch(error){setStatus("Greška pri brisanju: "+error.message)}finally{button.disabled=false}}});
+
+$("shirtForm").addEventListener("submit", async event => {
+  event.preventDefault();
+
+  if (!db || !currentUser || !isEditor) {
+    setStatus("Nemaš pravo uređivanja lagera.");
+    return;
+  }
+
+  const model = $("model").value.trim();
+  const boja = $("boja").value.trim();
+  const velicina = $("velicina").value.trim();
+  const kolicina = Number($("kolicina").value);
+  const minimalna_kolicina = Number($("minimalna_kolicina").value);
+
+  if (!model || !boja || !velicina) {
+    setStatus("Popuni sva polja.");
+    return;
+  }
+
+  if (
+    !Number.isSafeInteger(kolicina) || kolicina < 0 ||
+    !Number.isSafeInteger(minimalna_kolicina) || minimalna_kolicina < 0
+  ) {
+    setStatus("Količina i minimalna količina moraju biti cijeli brojevi od nule naviše.");
+    return;
+  }
+
+  $("saveBtn").disabled = true;
+
+  try {
+    let result;
+
+    if (editingId !== null) {
+      result = await db.from(TABLE_NAME)
+        .update({
+          model,
+          boja,
+          velicina,
+          kolicina,
+          minimalna_kolicina
+        })
+        .eq("id", editingId)
+        .select("id");
+
+      if (!result.error && (!result.data || !result.data.length)) {
+        throw Error("Izmjena nije potvrđena. Provjeri dozvole pristupa.");
+      }
+    } else {
+      result = await db.rpc("dodaj_majice_sa_minimumom", {
+        p_model: model,
+        p_boja: boja,
+        p_velicina: velicina,
+        p_kolicina: kolicina,
+        p_minimalna_kolicina: minimalna_kolicina
+      });
+    }
+
+    if (result.error) throw result.error;
+
+    resetForm();
+    await loadShirts();
+    setStatus("Podaci i minimalna količina uspješno su sačuvani.");
+  } catch (error) {
+    setStatus("Greška pri čuvanju: " + error.message);
+  } finally {
+    $("saveBtn").disabled = false;
+  }
+});
+
+$("shirtList").addEventListener("click",async event=>{const button=event.target.closest("button[data-action]");if(!button||!db||!currentUser||!isEditor)return;const item=shirts.find(shirt=>String(shirt.id)===String(button.dataset.id));if(!item)return;if(button.dataset.action==="edit"){editingId=item.id;$("model").value=item.model;$("boja").value=item.boja;$("velicina").value=item.velicina;
+                                                                                                                                                                                                                                                                                              $("kolicina").value=item.kolicina;
+                                                                                                                                                                                                                                                                                              $("minimalna_kolicina").value=item.minimalna_kolicina ?? 0;
+                                                                                                                                                                                                                                                                                              $("formTitle").textContent="Izmijeni podatke o majicama";
+                                                                                                                                                                                                                                                                                              $("saveBtn").textContent="Sačuvaj izmjene";$("cancelBtn").classList.remove("hidden");$("shirtForm").scrollIntoView({behavior:"smooth"})}else if(button.dataset.action==="delete"){if(!confirm("Da li sigurno želiš obrisati ovu stavku lagera?"))return;button.disabled=true;try{const {data,error}=await db.from(TABLE_NAME).delete().eq("id",item.id).select("id");if(error)throw error;if(!data||!data.length)throw Error("Brisanje nije potvrđeno. Provjeri dozvole pristupa.");if(String(editingId)===String(item.id))resetForm();await loadShirts();setStatus("Stavka je obrisana iz online baze.")}catch(error){setStatus("Greška pri brisanju: "+error.message)}finally{button.disabled=false}}});
 $("cancelBtn").addEventListener("click",resetForm);
 $("search").addEventListener("input",renderShirts);
 async function initialize(){
