@@ -443,6 +443,42 @@ function renderShirts() {
   }).join("");
 }
 
+
+function renderDopuna() {
+  const zaDopunu = shirts.filter(item =>
+    Number(item.minimalna_kolicina) > 0 &&
+    Number(item.kolicina) <= Number(item.minimalna_kolicina)
+  );
+
+  $("dopunaSummary").textContent =
+    "Broj stavki za dopunu: " + zaDopunu.length;
+
+  if (!zaDopunu.length) {
+    $("dopunaList").innerHTML =
+      '<tr><td colspan="6">Sve količine su iznad minimalnih.</td></tr>';
+    return;
+  }
+
+  $("dopunaList").innerHTML = zaDopunu.map(item => {
+    const kolicina = Number(item.kolicina);
+    const minimum = Number(item.minimalna_kolicina);
+    const nedostaje = Math.max(0, minimum - kolicina);
+
+    return `
+      <tr>
+        <td>${escapeHtml(item.model)}</td>
+        <td>${escapeHtml(item.boja)}</td>
+        <td>${escapeHtml(item.velicina)}</td>
+        <td>${kolicina}</td>
+        <td>${minimum}</td>
+        <td>${nedostaje}</td>
+      </tr>
+    `;
+  }).join("");
+}
+
+
+   
 async function loadShirts(){
   if(!db||!currentUser)return;
   const revision=sessionRevision;
@@ -456,6 +492,7 @@ async function loadShirts(){
     if(revision!==sessionRevision)return;
     shirts=data||[];
     renderShirts();
+    renderDopuna();
     setStatus("Podaci su učitani iz online baze.")
   }
   catch(error){
