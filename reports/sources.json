@@ -1,0 +1,15 @@
+{
+  "production_commit": "2e5905146c7eab28d85d082e97287a759e605814",
+  "test_commit": "46cb2cb32b6c4893b10ba408689dea75a68270ab",
+  "production_html_blob": "7860f900b223abcbd1e5898146c7d6ffe80f7251",
+  "test_html_blob": "8d80bb3e4b353459c7d59ea986569366c8f00d9b",
+  "logo_blob": "9466d5c6940812f4fadfcbc6a51e3a5c6b79d23c",
+  "sql_source": "User supplied CSV exports and explicit trigger/project confirmations; not a live database inspection",
+  "fixture": "Synthetic reproduction; no production Auth users or credentials",
+  "files": {
+    "index.html": "968df8625578d03b9360b86e35d2adf28e3353f9c7ff27143266226cbca933de",
+    "R BIRO logo.svg": "56d1eba028f3d84f7e093d54a281951c1ea20ffc9afb02b805d93e7e367f4aed",
+    "sql/02_minimal_migration.sql": "93d0d5de096de30477355b9dceb9c5812c02181dc1206613a26d2d9245c59da7",
+    "tests/fixtures/baseline.sql": "72c02749115252792901b64ccd7b165846385ce481e55447e6615eca091d22c3"
+  }
+}

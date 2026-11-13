@@ -1,0 +1,21 @@
+{
+  "name": "lager-majica-release-checks",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "test": "node --test tests/app.test.cjs && node tests/database.test.cjs && node tests/browser.test.cjs",
+    "test:app": "node --test tests/app.test.cjs",
+    "test:db": "node tests/database.test.cjs",
+    "test:browser": "node tests/browser.test.cjs",
+    "preview": "node tests/support/offline-server.cjs"
+  },
+  "devDependencies": {
+    "@embedded-postgres/linux-x64": "17.11.0-beta.19",
+    "pg": "8.16.3",
+    "exceljs": "4.4.0",
+    "playwright": "1.62.1"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

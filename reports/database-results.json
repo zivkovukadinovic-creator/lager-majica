@@ -1,0 +1,105 @@
+{
+  "version": {
+    "version": "PostgreSQL 17.11 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 7.5.0-3ubuntu1~18.04) 7.5.0, 64-bit",
+    "lc_ctype": "en_US.UTF-8"
+  },
+  "scope": "disposable Unix-socket-only local PostgreSQL; synthetic fixture; auth.uid claim stub; no Supabase connection",
+  "tests": [
+    {
+      "name": "original new-app payload creates a duplicate on old production structure",
+      "status": "PASS"
+    },
+    {
+      "name": "packaged read-only preflight and post-migration queries execute locally",
+      "status": "PASS"
+    },
+    {
+      "name": "default guard blocks execution",
+      "status": "PASS"
+    },
+    {
+      "name": "dry run checks every row and rolls back all canonical objects",
+      "status": "PASS"
+    },
+    {
+      "name": "minimal migration commits and preserves IDs, quantities, minima, RPC ACLs and column structure",
+      "status": "PASS"
+    },
+    {
+      "name": "aborts without partial changes: canonical collision",
+      "status": "PASS"
+    },
+    {
+      "name": "aborts without partial changes: NULL quantity",
+      "status": "PASS"
+    },
+    {
+      "name": "aborts without partial changes: blank color",
+      "status": "PASS"
+    },
+    {
+      "name": "aborts without partial changes: negative quantity",
+      "status": "PASS"
+    },
+    {
+      "name": "aborts without partial changes: unreviewed extra normalization",
+      "status": "PASS"
+    },
+    {
+      "name": "new function ACLs normalize default grants without changing existing RPC ACLs",
+      "status": "PASS"
+    },
+    {
+      "name": "old dodaj_majice aliases add to ID 30 and keep its minimum",
+      "status": "PASS"
+    },
+    {
+      "name": "minimum RPC accepts zero and replaces minimum without changing quantity",
+      "status": "PASS"
+    },
+    {
+      "name": "direct canonical collision is rejected without merging",
+      "status": "PASS"
+    },
+    {
+      "name": "editing into an occupied canonical key is rejected without merging",
+      "status": "PASS"
+    },
+    {
+      "name": "custom model is preserved; known aliases and large sizes canonicalize",
+      "status": "PASS"
+    },
+    {
+      "name": "smallint overflow is atomic; widening is not needed for standardization",
+      "status": "PASS"
+    },
+    {
+      "name": "two independent concurrent RPC sessions sum quantities and retain one new ID",
+      "status": "PASS"
+    },
+    {
+      "name": "mixed old/new RPC concurrency preserves sum and latest minimum update",
+      "status": "PASS"
+    },
+    {
+      "name": "migration lock prevents parallel writes until rollback",
+      "status": "PASS"
+    },
+    {
+      "name": "RLS: viewer reads but cannot change through either RPC or direct DML",
+      "status": "PASS"
+    },
+    {
+      "name": "RLS: editor can add, update and delete; only own editor UUID visible",
+      "status": "PASS"
+    },
+    {
+      "name": "RLS: anon sees no inventory and has no RPC execute",
+      "status": "PASS"
+    },
+    {
+      "name": "repeating migration is rejected without losing committed rows",
+      "status": "PASS"
+    }
+  ]
+}

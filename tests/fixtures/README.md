@@ -1,0 +1,1 @@
+Synthetic fixtures from reviewed production definitions. Only IDs 30/42 and their earlier supplied values are represented, not a fresh full production snapshot. auth.uid is stubbed locally. Never import production Auth accounts.
