@@ -1,419 +1,625 @@
 <!DOCTYPE html>
 <html lang="bs">
- <head>
-  <meta charset="utf-8"/>
-  <meta content="width=device-width,initial-scale=1" name="viewport"/>
-  <title>
-   Lager majica
-  </title>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
-  </script>
-  <style>
-   * {
-  box-sizing:border-box
-}
-body {
-  margin:0;
-  padding:16px;
-  font-family:Arial,sans-serif;
-  background:#f1f5f9;
-  color:#172033
-}
-.container {
-  max-width:1000px;
-  margin:auto
-}
-h1 {
-  text-align:center;
-  color:#17365d;
-  margin-bottom:8px
-}
-.subtitle {
-  text-align:center;
-  color:#64748b;
-  margin-bottom:24px
-}
-.panel {
-  background:white;
-  padding:20px;
-  border-radius:12px;
-  margin-bottom:20px;
-  box-shadow:0 2px 8px #0000000d
-}
-.form-grid {
-  display:grid;
-  grid-template-columns:repeat(2,minmax(0,1fr));
-  gap:14px
-}
-label {
-  display:block;
-  font-size:14px;
-  font-weight:bold;
-  margin-bottom:6px
-}
-input {
-  width:100%;
-  padding:12px;
-  border:1px solid #cbd5e1;
-  border-radius:7px;
-  font-size:16px
-}
-button {
-  padding:11px 15px;
-  border:0;
-  border-radius:7px;
-  font-size:14px;
-  font-weight:bold;
-  cursor:pointer
-}
-button:disabled {
-  opacity:.6;
-  cursor:wait
-}
-.primary {
-  background:#1769aa;
-  color:white
-}
-.secondary {
-  background:#e2e8f0;
-  color:#172033
-}
-.danger {
-  background:#dc2626;
-  color:white
-}
-.actions {
-  display:flex;
-  gap:8px;
-  flex-wrap:wrap;
-  margin-top:16px
-}
-.search {
-  margin-bottom:15px
-}
-.summary {
-  font-size:17px;
-  font-weight:bold;
-  margin-bottom:15px
-}
-.table-wrap {
-  overflow-x:auto
-}
-table {
-  width:100%;
-  border-collapse:collapse;
-  background:white
-}
-th,td {
-  padding:12px 10px;
-  border-bottom:1px solid #e2e8f0;
-  text-align:left
-}
-th {
-  background:#edf2f7;
-  white-space:nowrap
-}
-td {
-  overflow-wrap:anywhere
-}
-.quantity {
-  font-weight:bold;
-  font-size:17px
-}
-#status {
-  padding:12px;
-  margin-bottom:16px;
-  border-radius:7px;
-  background:#e2e8f0;
-  overflow-wrap:anywhere
-}
-.hidden {
-  display:none!important
-}
-.small-actions {
-  display:flex;
-  gap:6px;
-  flex-wrap:wrap
-}
-.userbar {
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:12px;
-  flex-wrap:wrap
-}
-.muted {
-  color:#64748b;
-  font-size:14px
-}
-.auth-box {
-  max-width:460px;
-  margin:auto
-}
-@media(max-width:600px) {
-  body {
-    padding:10px
-  }
-  .panel {
-    padding:14px
-  }
-  .form-grid {
-    grid-template-columns:1fr
-  }
-  th,td {
-    padding:9px 7px;
-    font-size:13px
-  }
-  button {
-    padding:10px
-  }
-}
-  </style>
- </head>
- <body>
-  <div class="container">
-   <h1>
-    LAGER MAJICA
-   </h1>
-   <p class="subtitle">
-    Evidencija stanja i količina
-   </p>
-   <div aria-live="polite" id="status" role="status">
-    Povezujem se sa bazom...
-   </div>
-   <section class="panel auth-box hidden" id="authPanel">
-    <h2 id="authTitle">
-     Prijava korisnika
-    </h2>
-    <form id="authForm">
-     <label for="email">
-      E-mail adresa
-     </label>
-     <input autocomplete="email" id="email" required="" type="email"/>
-     <label for="password" style="margin-top:14px">
-      Lozinka
-     </label>
-     <input autocomplete="current-password" id="password" minlength="6" required="" type="password"/>
-     <div class="actions">
-      <button class="primary" id="authSubmit" type="submit">
-       Prijavi se
-      <button class="secondary hidden" id="toggleAuth" type="button">
-      Napravi nalog
-      </button>
-     </div>
-    </form>
-    <p class="muted" id="authHint">
-    Prijavi se postojećim nalogom.
-    </p>
-   </section>
-   <div class="hidden" id="app">
-    <section class="panel userbar">
-     <div>
-      <strong id="userEmail">
-      </strong>
-      <div class="muted" id="userRole">
-      </div>
-     </div>
-     <button class="secondary" id="logoutBtn">
-      Odjavi se
-     </button>
-    </section>
-    <section class="panel hidden" id="editorPanel">
-     <h2 id="formTitle">
-      Dodaj majice na lager
-     </h2>
-     <form id="shirtForm">
-      <div class="form-grid">
-       <div>
-        <label for="model">
-         Model majice
-        </label>
-        <input id="model" placeholder="Npr. Basic" required="" type="text"/>
-       </div>
-       <div>
-        <label for="boja">
-         Boja
-        </label>
-        <input id="boja" placeholder="Npr. Crna" required="" type="text"/>
-       </div>
-       <div>
-        <label for="velicina">
-         Veličina
-        </label>
-        <input id="velicina" placeholder="Npr. M, L, XL" required="" type="text"/>
-       </div>
-    
-       <div>
-        <label for="kolicina">
-         Količina
-        </label>
-        <input id="kolicina" min="0" required="" step="1" type="number" value="0"/>
-       </div>
-     
 
-<div>
-  <label for="minimalna_kolicina">
-    Minimalna količina za upozorenje
-  </label>
-  <input id="minimalna_kolicina" min="0" required="" step="1" type="number" value="0"/>
-</div>
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width,initial-scale=1" name="viewport" />
+    <title>
+        Lager majica
+    </title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
+    <style>
+        * {
+            box-sizing: border-box
+        }
 
-</div>
-<div class="actions">
+        body {
+            margin: 0;
+            padding: 16px;
+            font-family: Arial, sans-serif;
+            background: #f1f5f9;
+            color: #172033
+        }
 
-      </div>
-      <div class="actions">
-       <button class="primary" id="saveBtn" type="submit">
-        Sačuvaj majice
-       </button>
-       <button class="secondary hidden" id="cancelBtn" type="button">
-        Odustani od izmjene
-       </button>
-      </div>
-     </form>
-    </section>
-    <section class="panel">
-     <h2>
-      Stanje lagera
-     </h2>
-     <div class="summary" id="summary">
-      Ukupno majica: 0
-     </div>
-     <input class="search" id="search" placeholder="Pretraži model, boju ili veličinu..." type="search"/>
-     <div class="table-wrap">
-      <table>
-       <thead>
-        <tr>
-         <th>
-          Model
-         </th>
-         <th>
-          Boja
-         </th>
-         <th>
-          Veličina
-         </th>
-         <th>
-          Količina
-         </th>
-        <th>
-          Minimum
-        </th>
-        <th>
-          Upozorenje
-        </th>
-        <th class="hidden" id="actionsHeader">
-          Akcije
-         </th>
-        </tr>
-       </thead>
-       <tbody id="shirtList">
-        <tr>
-         <td colspan="5">
-          Podaci još nisu učitani.
-         </td>
-        </tr>
-       </tbody>
-      </table>
-     </div>
-    </section>
+        .container {
+            max-width: 1000px;
+            margin: auto
+        }
 
-<section class="panel">
-  <h2>⚠ Majice za dopunu</h2>
+        h1 {
+            text-align: center;
+            color: #17365d;
+            margin-bottom: 8px
+        }
 
-  <div class="summary" id="dopunaSummary">
-    Provjeravam stanje lagera...
-  </div>
+        .subtitle {
+            text-align: center;
+            color: #64748b;
+            margin-bottom: 24px
+        }
 
-  <div class="table-wrap">
-    <table>
-      <thead>
-        <tr>
-          <th>Model</th>
-          <th>Boja</th>
-          <th>Veličina</th>
-          <th>Količina</th>
-          <th>Minimum</th>
-          <th>Za dopuniti</th>
-        </tr>
-      </thead>
+        .panel {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px #0000000d
+        }
 
-      <tbody id="dopunaList">
-        <tr>
-          <td colspan="6">Podaci još nisu učitani.</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-</section>
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 14px
+        }
 
-   
-   
-   
-   </div>
-  </div>
-  <script>
-   const SUPABASE_URL="https://uoonawjzquwcqnwqdjbu.supabase.co";
-const SUPABASE_ANON_KEY="sb_publishable_f4hBY2VssBilS_lL_GR-wQ__bnWwrzj";
-const TABLE_NAME="majice";
-let db=null,shirts=[],editingId=null,isEditor=false,currentUser=null,authMode="login",sessionRevision=0;
-const $=id=>document.getElementById(id);
-const setStatus=message=>{
-  $("status").textContent=message
-}
-;
-const escapeHtml=value=>String(value??"").replace(/[&<>"']/g,char=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"})[char]);
-function resetForm(){
-  $("shirtForm").reset();
-  $("kolicina").value="0";
-  editingId=null;
-  $("formTitle").textContent="Dodaj majice na lager";
-  $("saveBtn").textContent="Sačuvaj majice";
-  $("cancelBtn").classList.add("hidden")
-}
+        label {
+            display: block;
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 6px
+        }
 
-function renderShirts() {
-  const query = $("search").value.trim().toLowerCase();
+        input,
+        select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 7px;
+            font-size: 16px
+        }
 
-  const filtered = shirts.filter(item =>
-    [item.model, item.boja, item.velicina].some(value =>
-      String(value ?? "").toLowerCase().includes(query)
-    )
-  );
+        button {
+            padding: 11px 15px;
+            border: 0;
+            border-radius: 7px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer
+        }
 
-  const total = shirts.reduce(
-    (sum, item) => sum + Number(item.kolicina || 0), 0
-  );
+        button:disabled {
+            opacity: .6;
+            cursor: wait
+        }
 
-  const zaDopunu = shirts.filter(item =>
-    Number(item.minimalna_kolicina) > 0 &&
-    Number(item.kolicina) <= Number(item.minimalna_kolicina)
-  );
+        .primary {
+            background: #1769aa;
+            color: white
+        }
 
-  $("summary").textContent =
-    "Ukupno majica: " + total +
-    " | Broj različitih stavki: " + shirts.length +
-    " | Za dopunu: " + zaDopunu.length;
+        .secondary {
+            background: #e2e8f0;
+            color: #172033
+        }
 
-  const columns = isEditor ? 7 : 6;
+        .danger {
+            background: #dc2626;
+            color: white
+        }
 
-  if (!filtered.length) {
-    $("shirtList").innerHTML =
-      `<tr><td colspan="${columns}">Nema pronađenih majica.</td></tr>`;
-    return;
-  }
+        .actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 16px
+        }
 
-  $("shirtList").innerHTML = filtered.map(item => {
-    const kolicina = Number(item.kolicina);
-    const minimum = Number(item.minimalna_kolicina ?? 0);
+        .app-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 20px;
+            margin-bottom: 16px
+        }
 
-    const upozorenje = minimum > 0 && kolicina <= minimum;
+        .app-header h1, .app-header .subtitle {
+            text-align: left
+        }
 
-    const status = upozorenje
-      ? '<strong style="color:#dc2626;">⚠ POTREBNA DOPUNA</strong>'
-      : '<span style="color:#15803d;">U redu</span>';
+        .app-header h1 {
+            margin: 0;
+            line-height: 1.15
+        }
 
-    return `
+        .app-header .subtitle {
+            margin: 6px 0 0
+        }
+
+        .brand {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            line-height: 1.2;
+            text-align: center;
+            flex-shrink: 0;
+            color: #17365d;
+            font-weight: bold
+        }
+
+        .brand img {
+            display: block;
+            width: 140px;
+            height: auto
+        }
+
+        .filter-panel {
+            border: 1px solid #cbd5e1;
+            background: #f8fafc;
+            border-radius: 10px;
+            padding: 16px;
+            margin-bottom: 18px
+        }
+
+        .filter-panel h3 {
+            margin: 0 0 14px;
+            color: #17365d
+        }
+
+        .filter-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr)) auto;
+            align-items: end;
+            gap: 12px
+        }
+
+        .filter-grid button {
+            min-height: 44px
+        }
+
+        .summary {
+            font-size: 17px;
+            font-weight: bold;
+            margin-bottom: 15px
+        }
+
+        .table-wrap {
+            overflow-x: auto
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white
+        }
+
+        th,
+        td {
+            padding: 12px 10px;
+            border-bottom: 1px solid #e2e8f0;
+            text-align: left
+        }
+
+        th {
+            background: #edf2f7;
+            white-space: nowrap
+        }
+
+        td {
+            overflow-wrap: anywhere
+        }
+
+        .quantity {
+            font-weight: bold;
+            font-size: 17px
+        }
+
+        #status {
+            padding: 12px;
+            margin-bottom: 16px;
+            border-radius: 7px;
+            background: #e2e8f0;
+            overflow-wrap: anywhere
+        }
+
+        .hidden {
+            display: none !important
+        }
+
+        .small-actions {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap
+        }
+
+        .userbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap
+        }
+
+        .muted {
+            color: #64748b;
+            font-size: 14px
+        }
+
+        .auth-box {
+            max-width: 460px;
+            margin: auto
+        }
+
+        @media(max-width:600px) {
+            body {
+                padding: 10px
+            }
+
+            .panel {
+                padding: 14px
+            }
+
+            .app-header {
+                gap: 12px
+            }
+
+            .app-header h1 {
+                font-size: 24px
+            }
+
+            .brand img {
+                width: 110px
+            }
+
+            .filter-grid {
+                grid-template-columns: 1fr
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr
+            }
+
+            th,
+            td {
+                padding: 9px 7px;
+                font-size: 13px
+            }
+
+            button {
+                padding: 10px
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header class="app-header">
+            <div>
+                <h1>LAGER MAJICA</h1>
+                <p class="subtitle">Evidencija stanja i količina</p>
+            </div>
+            <div class="brand">
+                <img src="R%20BIRO%20logo.svg" alt="R BIRO logo" />
+                <div>R BIRO doo</div>
+            </div>
+        </header>
+        <div aria-live="polite" id="status" role="status">
+            Povezujem se sa bazom...
+        </div>
+        <section class="panel auth-box hidden" id="authPanel">
+            <h2 id="authTitle">
+                Prijava korisnika
+            </h2>
+            <form id="authForm">
+                <label for="email">
+                    E-mail adresa
+                </label>
+                <input autocomplete="email" id="email" required="" type="email" />
+                <label for="password" style="margin-top:14px">
+                    Lozinka
+                </label>
+                <input autocomplete="current-password" id="password" minlength="6" required="" type="password" />
+                <div class="actions">
+                    <button class="primary" id="authSubmit" type="submit">
+                        Prijavi se
+                    </button>
+                        <button class="secondary hidden" id="toggleAuth" type="button">
+                            Napravi nalog
+                        </button>
+                </div>
+            </form>
+            <p class="muted" id="authHint">
+                Prijavi se postojećim nalogom.
+            </p>
+        </section>
+        <div class="hidden" id="app">
+            <section class="panel userbar">
+                <div>
+                    <strong id="userEmail">
+                    </strong>
+                    <div class="muted" id="userRole">
+                    </div>
+                </div>
+                <button class="secondary" id="logoutBtn">
+                    Odjavi se
+                </button>
+            </section>
+            <section class="panel hidden" id="editorPanel">
+                <h2 id="formTitle">
+                    Dodaj majice na lager
+                </h2>
+                <form id="shirtForm">
+                    <div class="form-grid">
+                        <div>
+                            <label for="model">
+                                Model majice
+                            </label>
+                            <input id="model" placeholder="Npr. Basic" required="" type="text" />
+                        </div>
+                        <div>
+                            <label for="boja">
+                                Boja
+                            </label>
+                            <input id="boja" placeholder="Npr. Crna" required="" type="text" />
+                        </div>
+                        <div>
+                            <label for="velicina">
+                                Veličina
+                            </label>
+                            <input id="velicina" placeholder="Npr. M, L, XL" required="" type="text" />
+                        </div>
+
+                        <div>
+                            <label for="kolicina">
+                                Količina
+                            </label>
+                            <input id="kolicina" min="0" required="" step="1" type="number" value="0" />
+                        </div>
+
+
+                        <div>
+                            <label for="minimalna_kolicina">
+                                Minimalna količina za upozorenje
+                            </label>
+                            <input id="minimalna_kolicina" min="0" required="" step="1" type="number" value="0" />
+                        </div>
+
+                    </div>
+                    <div class="actions">
+
+                    </div>
+                    <div class="actions">
+                        <button class="primary" id="saveBtn" type="submit">
+                            Sačuvaj majice
+                        </button>
+                        <button class="secondary hidden" id="cancelBtn" type="button">
+                            Odustani od izmjene
+                        </button>
+                    </div>
+                </form>
+            </section>
+            <section class="panel">
+                <h2>
+                    Stanje lagera
+                </h2>
+                <div class="summary" id="summary">
+                    Ukupno majica: 0
+                </div>
+                <label for="search">Pretraga modela, boje ili veličine</label>
+                <input id="search" placeholder="Pretraži model, boju ili veličinu..." type="search" style="margin-bottom:16px" />
+                <section class="filter-panel" aria-labelledby="filterTitle">
+                    <h3 id="filterTitle">Filtriranje majica</h3>
+                    <div class="filter-grid">
+                        <div>
+                            <label for="filterModel">MODEL</label>
+                            <select id="filterModel"><option value="">Svi modeli</option></select>
+                        </div>
+                        <div>
+                            <label for="filterBoja">BOJA</label>
+                            <select id="filterBoja"><option value="">Sve boje</option></select>
+                        </div>
+                        <div>
+                            <label for="filterVelicina">VELIČINA</label>
+                            <select id="filterVelicina"><option value="">Sve veličine</option></select>
+                        </div>
+                        <div>
+                            <button class="secondary" id="resetFilters" type="button">Poništi filtere</button>
+                        </div>
+                    </div>
+                </section>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>
+                                    Model
+                                </th>
+                                <th>
+                                    Boja
+                                </th>
+                                <th>
+                                    Veličina
+                                </th>
+                                <th>
+                                    Količina
+                                </th>
+                                <th>
+                                    Minimum
+                                </th>
+                                <th>
+                                    Upozorenje
+                                </th>
+                                <th class="hidden" id="actionsHeader">
+                                    Akcije
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody id="shirtList">
+                            <tr>
+                                <td colspan="5">
+                                    Podaci još nisu učitani.
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section class="panel">
+                <h2>⚠ Majice za dopunu</h2>
+                <div class="actions" style="margin-bottom:16px">
+                    <button class="primary" id="exportOrder" type="button">Spisak za narudžbu (Excel)</button>
+                </div>
+
+                <div class="summary" id="dopunaSummary">
+                    Provjeravam stanje lagera...
+                </div>
+
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Model</th>
+                                <th>Boja</th>
+                                <th>Veličina</th>
+                                <th>Količina</th>
+                                <th>Minimum</th>
+                                <th>Za dopuniti</th>
+                            </tr>
+                        </thead>
+
+                        <tbody id="dopunaList">
+                            <tr>
+                                <td colspan="6">Podaci još nisu učitani.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+
+
+
+        </div>
+    </div>
+    <script>
+        const SUPABASE_URL = "https://uoonawjzquwcqnwqdjbu.supabase.co";
+        const SUPABASE_ANON_KEY = "sb_publishable_f4hBY2VssBilS_lL_GR-wQ__bnWwrzj";
+        const TABLE_NAME = "majice";
+        let db = null, shirts = [], editingId = null, isEditor = false, currentUser = null, authMode = "login", sessionRevision = 0;
+        const $ = id => document.getElementById(id);
+        const setStatus = message => {
+            $("status").textContent = message
+        }
+            ;
+        const escapeHtml = value => String(value ?? "").replace(/[&<>"']/g, char => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;" })[char]);
+        // Only known aliases are rewritten; custom model/size names retain their spelling.
+        function normalizeModel(value) {
+            const original = String(value ?? "");
+            const key = original.normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+                .replace(/\s+/g, "").toLowerCase();
+            const aliases = new Map([["muska", "Muška"], ["zenska", "Ženska"], ["djecja", "Dječija"], ["djecija", "Dječija"]]);
+            return aliases.get(key) ?? original;
+        }
+
+        function normalizeSize(value) {
+            const original = String(value ?? "");
+            const key = original.trim().toUpperCase();
+            if (["XS", "S", "M", "L", "XL"].includes(key)) return key;
+            if (/^X{2,}L$/.test(key)) return (key.length - 1) + "XL";
+            const numeric = key.match(/^([1-9]\d*)XL$/);
+            if (numeric) return numeric[1] === "1" ? "XL" : numeric[1] + "XL";
+            return original;
+        }
+
+        function compareSizes(left, right) {
+            const a = normalizeSize(left), b = normalizeSize(right);
+            const rank = size => {
+                const basic = ["XS", "S", "M", "L", "XL"].indexOf(size);
+                if (basic >= 0) return BigInt(basic);
+                return /^[1-9]\d*XL$/.test(size) ? BigInt(size.slice(0, -2)) + 3n : null;
+            };
+            const x = rank(a), y = rank(b);
+            if (x !== null && y !== null) return x < y ? -1 : x > y ? 1 : 0;
+            if (x !== null || y !== null) return x !== null ? -1 : 1;
+            return a.localeCompare(b, "bs", { numeric: true });
+        }
+
+        function normalizeShirt(item) {
+            return { ...item, model: normalizeModel(item.model), velicina: normalizeSize(item.velicina) };
+        }
+
+        function sameShirt(item, model, boja, velicina) {
+            const modelKey = value => normalizeModel(value).trim().toLowerCase();
+            const sizeKey = value => normalizeSize(value).trim().toUpperCase();
+            return modelKey(item.model) === modelKey(model) &&
+                String(item.boja ?? "").trim().toLowerCase() === boja.trim().toLowerCase() &&
+                sizeKey(item.velicina) === sizeKey(velicina);
+        }
+
+        function resetForm() {
+            $("shirtForm").reset();
+            $("kolicina").value = "0";
+            editingId = null;
+            $("formTitle").textContent = "Dodaj majice na lager";
+            $("saveBtn").textContent = "Sačuvaj majice";
+            $("cancelBtn").classList.add("hidden")
+        }
+
+        function populateFilters() {
+            [
+                ["filterModel", "model", "Svi modeli"],
+                ["filterBoja", "boja", "Sve boje"],
+                ["filterVelicina", "velicina", "Sve veličine"]
+            ].forEach(([id, field, placeholder]) => {
+                const select = $(id);
+                const selected = select.value;
+                const values = [...new Set(shirts.map(item => String(item[field] ?? "")))]
+                    .filter(value => value.trim() !== "")
+                    .sort(field === "velicina" ? compareSizes : (a, b) => a.localeCompare(b, "bs", { numeric: true }));
+                select.replaceChildren(new Option(placeholder, ""));
+                values.forEach(value => select.add(new Option(value, value)));
+                select.value = values.includes(selected) ? selected : "";
+            });
+        }
+
+        function renderShirts() {
+            const model = $("filterModel").value;
+            const boja = $("filterBoja").value;
+            const velicina = $("filterVelicina").value;
+
+            const query = $("search").value.trim().toLowerCase();
+            const filtered = shirts.filter(item =>
+                (!model || String(item.model ?? "") === model) &&
+                (!boja || String(item.boja ?? "") === boja) &&
+                (!velicina || String(item.velicina ?? "") === velicina) &&
+                (!query || [item.model, item.boja, item.velicina].some(value => String(value ?? "").toLowerCase().includes(query)) ||
+                    normalizeSize(item.velicina).toLowerCase().includes(normalizeSize(query).toLowerCase()))
+            );
+
+            const total = shirts.reduce(
+                (sum, item) => sum + Number(item.kolicina || 0), 0
+            );
+
+            const zaDopunu = shirts.filter(needsRestock).sort(compareOrderItems);
+
+            $("summary").textContent =
+                "Ukupno majica: " + total +
+                " | Broj različitih stavki: " + shirts.length +
+                " | Za dopunu: " + zaDopunu.length;
+
+            const columns = isEditor ? 7 : 6;
+
+            if (!filtered.length) {
+                $("shirtList").innerHTML =
+                    `<tr><td colspan="${columns}">Nema pronađenih majica.</td></tr>`;
+                return;
+            }
+
+            $("shirtList").innerHTML = filtered.map(item => {
+                const kolicina = Number(item.kolicina);
+                const minimum = Number(item.minimalna_kolicina ?? 0);
+
+                const upozorenje = minimum > 0 && kolicina <= minimum;
+
+                const status = upozorenje
+                    ? '<strong style="color:#dc2626;">⚠ POTREBNA DOPUNA</strong>'
+                    : '<span style="color:#15803d;">U redu</span>';
+
+                return `
       <tr style="${upozorenje ? 'background:#fef2f2;' : ''}">
         <td>${escapeHtml(item.model)}</td>
         <td>${escapeHtml(item.boja)}</td>
@@ -435,31 +641,109 @@ function renderShirts() {
         ` : ""}
       </tr>
     `;
-  }).join("");
-}
+            }).join("");
+        }
 
 
-function renderDopuna() {
-  const zaDopunu = shirts.filter(item =>
-    Number(item.minimalna_kolicina) > 0 &&
-    Number(item.kolicina) <= Number(item.minimalna_kolicina)
-  );
+        // Minimum 0 disables restock warnings, matching the existing inventory logic.
+        function needsRestock(item) {
+            return Number(item.minimalna_kolicina) > 0 &&
+                Number(item.kolicina) <= Number(item.minimalna_kolicina);
+        }
 
-  $("dopunaSummary").textContent =
-    "Broj stavki za dopunu: " + zaDopunu.length;
+        function compareOrderItems(a, b) {
+            const normalize = value => String(value ?? "").trim().toLocaleLowerCase("bs");
+            const compare = (left, right, preferred) => {
+                const x = normalize(left), y = normalize(right);
+                const rank = value => {
+                    const index = preferred.indexOf(value);
+                    return index < 0 ? preferred.length : index;
+                };
+                return rank(x) - rank(y) || x.localeCompare(y, "bs", { numeric: true });
+            };
+            return compare(a.model, b.model, ["muška", "ženska", "dječija"]) ||
+                compare(a.boja, b.boja, ["bijela", "crna"]) ||
+                compareSizes(a.velicina, b.velicina);
+        }
 
-  if (!zaDopunu.length) {
-    $("dopunaList").innerHTML =
-      '<tr><td colspan="6">Sve količine su iznad minimalnih.</td></tr>';
-    return;
-  }
+        async function exportOrder() {
+            const items = shirts.filter(needsRestock).sort(compareOrderItems);
+            if (!items.length) {
+                setStatus("Nema majica za dopunu. Spisak za narudžbu nije napravljen.");
+                return;
+            }
+            const button = $("exportOrder");
+            button.disabled = true;
+            try {
+                if (!window.ExcelJS) throw Error("Excel biblioteka nije učitana. Provjeri internet vezu i osvježi stranicu.");
+                const workbook = new ExcelJS.Workbook();
+                const sheet = workbook.addWorksheet("Narudžba majica");
+                const now = new Date();
+                const date = new Intl.DateTimeFormat("bs-BA", {
+                    day: "2-digit", month: "2-digit", year: "numeric"
+                }).format(now);
+                sheet.columns = [28, 24, 16, 14, 14, 20].map(width => ({ width }));
+                sheet.mergeCells("A1:F1");
+                sheet.getCell("A1").value = "R BIRO doo — Spisak za narudžbu majica";
+                sheet.getCell("A1").font = { bold: true, size: 16, color: { argb: "FF17365D" } };
+                sheet.getRow(1).height = 30;
+                sheet.mergeCells("A2:F2");
+                sheet.getCell("A2").value = "Datum izrade: " + date;
+                const header = sheet.getRow(4);
+                header.values = ["Model", "Boja", "Veličina", "Stanje", "Minimum", "Za narudžbu"];
+                header.font = { bold: true, color: { argb: "FFFFFFFF" } };
+                header.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FF17365D" } };
+                header.height = 24;
+                items.forEach(item => {
+                    // Strings stay text cells, including values starting with '='.
+                    const row = sheet.addRow([
+                        String(item.model ?? ""), String(item.boja ?? ""), String(item.velicina ?? ""),
+                        Number(item.kolicina), Number(item.minimalna_kolicina), null
+                    ]);
+                    row.height = 22;
+                    row.getCell(6).fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FFFFF9DB" } };
+                    [4, 5, 6].forEach(column => { row.getCell(column).numFmt = "0"; });
+                });
+                sheet.views = [{ state: "frozen", ySplit: 4 }];
+                sheet.autoFilter = { from: "A4", to: "F" + sheet.rowCount };
+                const buffer = await workbook.xlsx.writeBuffer();
+                const url = URL.createObjectURL(new Blob([buffer], {
+                    type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                }));
+                const link = document.createElement("a");
+                link.href = url;
+                const filenameDate = [now.getFullYear(), String(now.getMonth() + 1).padStart(2, "0"), String(now.getDate()).padStart(2, "0")].join("-");
+                link.download = "R-BIRO-narudzba-majica-" + filenameDate + ".xlsx";
+                document.body.append(link);
+                link.click();
+                link.remove();
+                setTimeout(() => URL.revokeObjectURL(url), 60000);
+                setStatus("Excel spisak za narudžbu je preuzet.");
+            } catch (error) {
+                setStatus("Greška pri izvozu: " + error.message);
+            } finally {
+                button.disabled = false;
+            }
+        }
 
-  $("dopunaList").innerHTML = zaDopunu.map(item => {
-    const kolicina = Number(item.kolicina);
-    const minimum = Number(item.minimalna_kolicina);
-    const nedostaje = Math.max(0, minimum - kolicina);
+        function renderDopuna() {
+            const zaDopunu = shirts.filter(needsRestock).sort(compareOrderItems);
 
-    return `
+            $("dopunaSummary").textContent =
+                "Broj stavki za dopunu: " + zaDopunu.length;
+
+            if (!zaDopunu.length) {
+                $("dopunaList").innerHTML =
+                    '<tr><td colspan="6">Sve količine su iznad minimalnih.</td></tr>';
+                return;
+            }
+
+            $("dopunaList").innerHTML = zaDopunu.map(item => {
+                const kolicina = Number(item.kolicina);
+                const minimum = Number(item.minimalna_kolicina);
+                const nedostaje = Math.max(0, minimum - kolicina);
+
+                return `
       <tr>
         <td>${escapeHtml(item.model)}</td>
         <td>${escapeHtml(item.boja)}</td>
@@ -469,179 +753,237 @@ function renderDopuna() {
         <td>${nedostaje}</td>
       </tr>
     `;
-  }).join("");
-}
+            }).join("");
+        }
 
 
-   
-async function loadShirts(){
-  if(!db||!currentUser)return;
-  const revision=sessionRevision;
-  setStatus("Učitavam podatke iz online baze...");
-  try{
-    const {
-      data,error
-    }
-    =await db.from(TABLE_NAME).select("id, model, boja, velicina, kolicina, minimalna_kolicina").order("model",{ascending:true});
-    if(error)throw error;
-    if(revision!==sessionRevision)return;
-    shirts=data||[];
-    renderShirts();
-    renderDopuna();
-    setStatus("Podaci su učitani iz online baze.")
-  }
-  catch(error){
-    if(revision===sessionRevision)setStatus("Greška pri učitavanju: "+error.message)
-  }
-}
-async function applySession(session){
-  const revision=++sessionRevision;
-  const user=session?.user||null;
-  currentUser=user;
-  isEditor=false;
-  shirts=[];
-  resetForm();
-  $("app").classList.add("hidden");
-  $("authPanel").classList.add("hidden");
-  if(!user){
-    $("authPanel").classList.remove("hidden");
-    setStatus("Prijavi se za pristup lageru.");
-    return
-  }
-  setStatus("Provjeravam korisnička prava...");
-  try{
-    const {
-      data,error
-    }
-    =await db.from("lager_urednici").select("user_id").eq("user_id",user.id).maybeSingle();
-    if(error)throw error;
-    if(revision!==sessionRevision)return;
-    isEditor=!!data;
-    $("userEmail").textContent=user.email||"Prijavljen korisnik";
-    $("userRole").textContent=isEditor?"Urednik – pregled i izmjene":"Korisnik – samo pregled";
-    $("editorPanel").classList.toggle("hidden",!isEditor);
-    $("actionsHeader").classList.toggle("hidden",!isEditor);
-    $("app").classList.remove("hidden");
-    await loadShirts()
-  }
-  catch(error){
-    if(revision!==sessionRevision)return;
-    $("authPanel").classList.remove("hidden");
-    setStatus("Ne mogu provjeriti prava pristupa: "+error.message)
-  }
-}
-function showAuthMode(){
-  authMode = "login";
-  $("authTitle").textContent = "Prijava korisnika";
-  $("authSubmit").textContent = "Prijavi se";
-  $("toggleAuth").classList.add("hidden");
-  $("password").autocomplete = "current-password";
-  $("authHint").textContent = "Prijavi se postojećim nalogom.";
-}
-$("authForm").addEventListener("submit",async event=>{event.preventDefault();if(!db)return;const email=$("email").value.trim(),password=$("password").value,register=authMode==="register";$("authSubmit").disabled=true;try{if(register){const {data,error}=await db.auth.signUp({email,password});if(error)throw error;if(data.session){await applySession(data.session)}else{setStatus("Zahtjev za registraciju je primljen. Ako je potrebna potvrda e-maila, provjeri poštu, a zatim se prijavi.");authMode="login";showAuthMode()}}else{const {data,error}=await db.auth.signInWithPassword({email,password});if(error)throw error;await applySession(data.session)}$("password").value=""}catch(error){setStatus("Greška pri "+(register?"registraciji":"prijavi")+": "+error.message)}finally{$("authSubmit").disabled=false}});
-   
 
-$("logoutBtn").addEventListener("click", async () => {
-  const { error } = await db.auth.signOut();
+        async function loadShirts() {
+            if (!db || !currentUser) return;
+            const revision = sessionRevision;
+            setStatus("Učitavam podatke iz online baze...");
+            try {
+                const {
+                    data, error
+                }
+                    = await db.from(TABLE_NAME).select("id, model, boja, velicina, kolicina, minimalna_kolicina").order("model", { ascending: true });
+                if (error) throw error;
+                if (revision !== sessionRevision) return;
+                shirts = (data || []).map(normalizeShirt).sort(compareOrderItems);
+                populateFilters();
+                renderShirts();
+                renderDopuna();
+                setStatus("Podaci su učitani iz online baze.")
+            }
+            catch (error) {
+                if (revision === sessionRevision) setStatus("Greška pri učitavanju: " + error.message)
+            }
+        }
+        async function applySession(session) {
+            const revision = ++sessionRevision;
+            const user = session?.user || null;
+            currentUser = user;
+            isEditor = false;
+            shirts = [];
+            resetForm();
+            $("app").classList.add("hidden");
+            $("authPanel").classList.add("hidden");
+            if (!user) {
+                $("authPanel").classList.remove("hidden");
+                setStatus("Prijavi se za pristup lageru.");
+                return
+            }
+            setStatus("Provjeravam korisnička prava...");
+            try {
+                const {
+                    data, error
+                }
+                    = await db.from("lager_urednici").select("user_id").eq("user_id", user.id).maybeSingle();
+                if (error) throw error;
+                if (revision !== sessionRevision) return;
+                isEditor = !!data;
+                let migrationWarning = "";
+                if (isEditor) {
+                    const { data: canonicalSize, error: readinessError } = await db.rpc(
+                        "majice_canonical_size_v4", { value: "XXL" }
+                    );
+                    if (revision !== sessionRevision) return;
+                    if (readinessError || canonicalSize !== "2XL") {
+                        isEditor = false;
+                        migrationWarning = "Pregled je dostupan. Upis nove verzije čeka provjerenu migraciju baze.";
+                    }
+                }
+                $("userEmail").textContent = user.email || "Prijavljen korisnik";
+                $("userRole").textContent = migrationWarning ? "Urednik – upis privremeno zaustavljen" : isEditor ? "Urednik – pregled i izmjene" : "Korisnik – samo pregled";
+                $("editorPanel").classList.toggle("hidden", !isEditor);
+                $("actionsHeader").classList.toggle("hidden", !isEditor);
+                $("app").classList.remove("hidden");
+                await loadShirts();
+                if (migrationWarning) setStatus(migrationWarning);
+            }
+            catch (error) {
+                if (revision !== sessionRevision) return;
+                $("authPanel").classList.remove("hidden");
+                setStatus("Ne mogu provjeriti prava pristupa: " + error.message)
+            }
+        }
+        function showAuthMode() {
+            authMode = "login";
+            $("authTitle").textContent = "Prijava korisnika";
+            $("authSubmit").textContent = "Prijavi se";
+            $("toggleAuth").classList.add("hidden");
+            $("password").autocomplete = "current-password";
+            $("authHint").textContent = "Prijavi se postojećim nalogom.";
+        }
+        $("authForm").addEventListener("submit", async event => {
+            event.preventDefault();
+            if (!db) return;
+            $("authSubmit").disabled = true;
+            try {
+                const { data, error } = await db.auth.signInWithPassword({
+                    email: $("email").value.trim(), password: $("password").value
+                });
+                if (error) throw error;
+                await applySession(data.session);
+                $("password").value = "";
+            } catch (error) {
+                setStatus("Greška pri prijavi: " + error.message);
+            } finally {
+                $("authSubmit").disabled = false;
+            }
+        });
 
-  if (error) {
-    setStatus("Greška pri odjavi: " + error.message);
-  } else {
-    $("email").value = "";
-    $("password").value = "";
-    await applySession(null);
-  }
-});
 
-   
+        $("logoutBtn").addEventListener("click", async () => {
+            const { error } = await db.auth.signOut();
 
-$("shirtForm").addEventListener("submit", async event => {
-  event.preventDefault();
+            if (error) {
+                setStatus("Greška pri odjavi: " + error.message);
+            } else {
+                $("email").value = "";
+                $("password").value = "";
+                await applySession(null);
+            }
+        });
 
-  if (!db || !currentUser || !isEditor) {
-    setStatus("Nemaš pravo uređivanja lagera.");
-    return;
-  }
 
-  const model = $("model").value.trim();
-  const boja = $("boja").value.trim();
-  const velicina = $("velicina").value.trim();
-  const kolicina = Number($("kolicina").value);
-  const minimalna_kolicina = Number($("minimalna_kolicina").value);
 
-  if (!model || !boja || !velicina) {
-    setStatus("Popuni sva polja.");
-    return;
-  }
+        $("shirtForm").addEventListener("submit", async event => {
+            event.preventDefault();
 
-  if (
-    !Number.isSafeInteger(kolicina) || kolicina < 0 ||
-    !Number.isSafeInteger(minimalna_kolicina) || minimalna_kolicina < 0
-  ) {
-    setStatus("Količina i minimalna količina moraju biti cijeli brojevi od nule naviše.");
-    return;
-  }
+            if (!db || !currentUser || !isEditor) {
+                setStatus("Nemaš pravo uređivanja lagera.");
+                return;
+            }
 
-  $("saveBtn").disabled = true;
+            const model = normalizeModel($("model").value.trim());
+            const boja = $("boja").value.trim();
+            const velicina = normalizeSize($("velicina").value.trim());
+            const kolicina = Number($("kolicina").value);
+            const minimalna_kolicina = Number($("minimalna_kolicina").value);
 
-  try {
-    let result;
+            if (!model || !boja || !velicina) {
+                setStatus("Popuni sva polja.");
+                return;
+            }
 
-    if (editingId !== null) {
-      result = await db.from(TABLE_NAME)
-        .update({
-          model,
-          boja,
-          velicina,
-          kolicina,
-          minimalna_kolicina
-        })
-        .eq("id", editingId)
-        .select("id");
+            if (
+                !Number.isSafeInteger(kolicina) || kolicina < 0 ||
+                !Number.isSafeInteger(minimalna_kolicina) || minimalna_kolicina < 0
+            ) {
+                setStatus("Količina i minimalna količina moraju biti cijeli brojevi od nule naviše.");
+                return;
+            }
 
-      if (!result.error && (!result.data || !result.data.length)) {
-        throw Error("Izmjena nije potvrđena. Provjeri dozvole pristupa.");
-      }
-    } else {
-      result = await db.rpc("dodaj_majice_sa_minimumom", {
-        p_model: model,
-        p_boja: boja,
-        p_velicina: velicina,
-        p_kolicina: kolicina,
-        p_minimalna_kolicina: minimalna_kolicina
-      });
-    }
+            $("saveBtn").disabled = true;
 
-    if (result.error) throw result.error;
+            try {
+                // Refresh identities before writing; never merge quantities/minima in the browser.
+                // A database canonical key is still required for concurrent/direct-client writes.
+                const { data: existing, error: lookupError } = await db.from(TABLE_NAME)
+                    .select("id, model, boja, velicina");
+                if (lookupError) throw lookupError;
+                const matches = (existing || []).filter(item => sameShirt(item, model, boja, velicina));
+                if (matches.length > 1) {
+                    throw Error("Postoje ekvivalentne stavke. Potrebna je provjera količina i minimuma prije čuvanja.");
+                }
+                if (editingId !== null && matches.some(item => String(item.id) !== String(editingId))) {
+                    throw Error("Stavka istog modela, boje i veličine već postoji. Uredi postojeću stavku; količine i minimumi nisu spojeni.");
+                }
+                let result;
 
-    resetForm();
-    await loadShirts();
-    setStatus("Podaci i minimalna količina uspješno su sačuvani.");
-  } catch (error) {
-    setStatus("Greška pri čuvanju: " + error.message);
-  } finally {
-    $("saveBtn").disabled = false;
-  }
-});
+                if (editingId !== null) {
+                    result = await db.from(TABLE_NAME)
+                        .update({
+                            model,
+                            boja,
+                            velicina,
+                            kolicina,
+                            minimalna_kolicina
+                        })
+                        .eq("id", editingId)
+                        .select("id");
 
-$("shirtList").addEventListener("click",async event=>{const button=event.target.closest("button[data-action]");if(!button||!db||!currentUser||!isEditor)return;const item=shirts.find(shirt=>String(shirt.id)===String(button.dataset.id));if(!item)return;if(button.dataset.action==="edit"){editingId=item.id;$("model").value=item.model;$("boja").value=item.boja;$("velicina").value=item.velicina;
-                                                                                                                                                                                                                                                                                              $("kolicina").value=item.kolicina;
-                                                                                                                                                                                                                                                                                              $("minimalna_kolicina").value=item.minimalna_kolicina ?? 0;
-                                                                                                                                                                                                                                                                                              $("formTitle").textContent="Izmijeni podatke o majicama";
-                                                                                                                                                                                                                                                                                              $("saveBtn").textContent="Sačuvaj izmjene";$("cancelBtn").classList.remove("hidden");$("shirtForm").scrollIntoView({behavior:"smooth"})}else if(button.dataset.action==="delete"){if(!confirm("Da li sigurno želiš obrisati ovu stavku lagera?"))return;button.disabled=true;try{const {data,error}=await db.from(TABLE_NAME).delete().eq("id",item.id).select("id");if(error)throw error;if(!data||!data.length)throw Error("Brisanje nije potvrđeno. Provjeri dozvole pristupa.");if(String(editingId)===String(item.id))resetForm();await loadShirts();setStatus("Stavka je obrisana iz online baze.")}catch(error){setStatus("Greška pri brisanju: "+error.message)}finally{button.disabled=false}}});
-$("cancelBtn").addEventListener("click",resetForm);
-$("search").addEventListener("input",renderShirts);
-async function initialize(){
-  try{
-    if(!window.supabase)throw Error("Supabase biblioteka nije učitana.");
-    db=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
-    db.auth.onAuthStateChange((event,session)=>{if(event==="SIGNED_OUT"){applySession(null)}else if(event==="SIGNED_IN"||event==="INITIAL_SESSION"||event==="USER_UPDATED"){applySession(session)}})
-  }
-  catch(error){
-    setStatus("Greška pri povezivanju: "+error.message)
-  }
-}
-initialize();
-  </script>
- </body>
+                    if (!result.error && (!result.data || !result.data.length)) {
+                        throw Error("Izmjena nije potvrđena. Provjeri dozvole pristupa.");
+                    }
+                } else {
+                    result = await db.rpc("dodaj_majice_sa_minimumom", {
+                        // Requires the reviewed canonical-key migration before enabling writes.
+                        p_model: model,
+                        p_boja: boja,
+                        p_velicina: velicina,
+                        p_kolicina: kolicina,
+                        p_minimalna_kolicina: minimalna_kolicina
+                    });
+                }
+
+                if (result.error) throw result.error;
+
+                resetForm();
+                await loadShirts();
+                setStatus("Podaci i minimalna količina uspješno su sačuvani.");
+            } catch (error) {
+                setStatus("Greška pri čuvanju: " + error.message);
+            } finally {
+                $("saveBtn").disabled = false;
+            }
+        });
+
+        $("shirtList").addEventListener("click", async event => {
+            const button = event.target.closest("button[data-action]"); if (!button || !db || !currentUser || !isEditor) return; const item = shirts.find(shirt => String(shirt.id) === String(button.dataset.id)); if (!item) return; if (button.dataset.action === "edit") {
+                editingId = item.id; $("model").value = item.model; $("boja").value = item.boja; $("velicina").value = item.velicina;
+                $("kolicina").value = item.kolicina;
+                $("minimalna_kolicina").value = item.minimalna_kolicina ?? 0;
+                $("formTitle").textContent = "Izmijeni podatke o majicama";
+                $("saveBtn").textContent = "Sačuvaj izmjene"; $("cancelBtn").classList.remove("hidden"); $("shirtForm").scrollIntoView({ behavior: "smooth" })
+            } else if (button.dataset.action === "delete") { if (!confirm("Da li sigurno želiš obrisati ovu stavku lagera?")) return; button.disabled = true; try { const { data, error } = await db.from(TABLE_NAME).delete().eq("id", item.id).select("id"); if (error) throw error; if (!data || !data.length) throw Error("Brisanje nije potvrđeno. Provjeri dozvole pristupa."); if (String(editingId) === String(item.id)) resetForm(); await loadShirts(); setStatus("Stavka je obrisana iz online baze.") } catch (error) { setStatus("Greška pri brisanju: " + error.message) } finally { button.disabled = false } }
+        });
+        $("cancelBtn").addEventListener("click", resetForm);
+        $("exportOrder").addEventListener("click", exportOrder);
+        $("search").addEventListener("input", renderShirts);
+        ["filterModel", "filterBoja", "filterVelicina"].forEach(id => {
+            $(id).addEventListener("change", renderShirts);
+        });
+        $("resetFilters").addEventListener("click", () => {
+            $("search").value = "";
+            ["filterModel", "filterBoja", "filterVelicina"].forEach(id => {
+                $(id).value = "";
+            });
+            renderShirts();
+        });
+        async function initialize() {
+            try {
+                if (!window.supabase) throw Error("Supabase biblioteka nije učitana.");
+                db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                db.auth.onAuthStateChange((event, session) => { if (event === "SIGNED_OUT") { applySession(null) } else if (event === "SIGNED_IN" || event === "INITIAL_SESSION" || event === "USER_UPDATED") { applySession(session) } })
+            }
+            catch (error) {
+                setStatus("Greška pri povezivanju: " + error.message)
+            }
+        }
+        initialize();
+    </script>
+</body>
+
 </html>

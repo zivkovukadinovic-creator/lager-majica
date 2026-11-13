@@ -1,0 +1,48 @@
+{
+  "browser": "156.0.8078.79",
+  "scope": "real Chromium with real ExcelJS; offline Supabase test double; connect-src none; loopback only",
+  "tests": [
+    {
+      "name": "login screen and R BIRO logo render",
+      "status": "PASS"
+    },
+    {
+      "name": "viewer sees inventory with no editor controls",
+      "status": "PASS"
+    },
+    {
+      "name": "three filters and legacy-size text search combine",
+      "status": "PASS"
+    },
+    {
+      "name": "reset restores all inventory rows and clears text search",
+      "status": "PASS"
+    },
+    {
+      "name": "real browser XLSX download opens with correct rows, quantities and blank order column",
+      "status": "PASS"
+    },
+    {
+      "name": "editor adds canonical quantity to existing ID without duplicate",
+      "status": "PASS"
+    },
+    {
+      "name": "editing sets absolute quantity",
+      "status": "PASS"
+    },
+    {
+      "name": "canonical new row and confirmed delete work",
+      "status": "PASS"
+    },
+    {
+      "name": "mobile 375px layout has no page-level horizontal overflow",
+      "status": "PASS"
+    },
+    {
+      "name": "no JavaScript errors, Supabase requests, email or other external requests",
+      "status": "PASS"
+    }
+  ],
+  "externalRequests": [],
+  "pageErrors": []
+}

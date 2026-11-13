@@ -1,0 +1,66 @@
+
+> lager-majica-release-checks@1.0.0 test
+> node --test tests/app.test.cjs && node tests/database.test.cjs && node tests/browser.test.cjs
+
+✔ models: all requested aliases, decomposed accents, spaces; custom names preserved (10.619818ms)
+✔ sizes: aliases, large sizes, natural order and unknown labels (2.463362ms)
+✔ loaded rows retain IDs, quantities and minima; filters collapse aliases; all filters combine (14.955687ms)
+✔ new and legacy-match writes send canonical RPC payload (7.591246ms)
+✔ existing duplicate groups and edit collisions block writes without merging (6.932109ms)
+✔ Excel receives canonical labels and natural order without altering quantities/minima (20.69859ms)
+✔ collision identity retains existing database case-insensitive color/custom-name rules (3.218188ms)
+✔ production configuration retained and no test endpoint or signup call remains (0.275329ms)
+✔ production text search combines with three filters and reset clears all four (2.006734ms)
+✔ viewer form submission cannot call any write (2.145757ms)
+✔ zero quantity remains allowed by production RPC contract (2.154942ms)
+✔ HTML escapes untrusted inventory labels (2.437844ms)
+✔ real XLSX roundtrip preserves text cells, quantities, empty order column and size order (624.907217ms)
+✔ editor login fails closed for writes when migration helper is missing (2.521168ms)
+ℹ tests 14
+ℹ suites 0
+ℹ pass 14
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 852.733397
+{"version":"PostgreSQL 17.11 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 7.5.0-3ubuntu1~18.04) 7.5.0, 64-bit","lc_ctype":"en_US.UTF-8"}
+PASS original new-app payload creates a duplicate on old production structure
+PASS packaged read-only preflight and post-migration queries execute locally
+PASS default guard blocks execution
+PASS dry run checks every row and rolls back all canonical objects
+PASS minimal migration commits and preserves IDs, quantities, minima, RPC ACLs and column structure
+PASS aborts without partial changes: canonical collision
+PASS aborts without partial changes: NULL quantity
+PASS aborts without partial changes: blank color
+PASS aborts without partial changes: negative quantity
+PASS aborts without partial changes: unreviewed extra normalization
+PASS new function ACLs normalize default grants without changing existing RPC ACLs
+PASS old dodaj_majice aliases add to ID 30 and keep its minimum
+PASS minimum RPC accepts zero and replaces minimum without changing quantity
+PASS direct canonical collision is rejected without merging
+PASS editing into an occupied canonical key is rejected without merging
+PASS custom model is preserved; known aliases and large sizes canonicalize
+PASS smallint overflow is atomic; widening is not needed for standardization
+PASS two independent concurrent RPC sessions sum quantities and retain one new ID
+PASS mixed old/new RPC concurrency preserves sum and latest minimum update
+PASS migration lock prevents parallel writes until rollback
+PASS RLS: viewer reads but cannot change through either RPC or direct DML
+PASS RLS: editor can add, update and delete; only own editor UUID visible
+PASS RLS: anon sees no inventory and has no RPC execute
+PASS repeating migration is rejected without losing committed rows
+PASS login screen and R BIRO logo render
+PASS viewer sees inventory with no editor controls
+PASS three filters and legacy-size text search combine
+PASS reset restores all inventory rows and clears text search
+PASS real browser XLSX download opens with correct rows, quantities and blank order column
+PASS editor adds canonical quantity to existing ID without duplicate
+PASS editing sets absolute quantity
+PASS canonical new row and confirmed delete work
+PASS mobile 375px layout has no page-level horizontal overflow
+PASS no JavaScript errors, Supabase requests, email or other external requests
+npm notice
+npm notice New major version of npm available! 11.9.0 -> 12.2.2
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.2
+npm notice To update run: npm install -g npm@12.2.2
+npm notice

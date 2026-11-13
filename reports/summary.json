@@ -1,0 +1,19 @@
+{
+  "application_tests": 14,
+  "database_tests": 24,
+  "browser_checks": 10,
+  "total": 48,
+  "status": "PASS",
+  "postgres": {
+    "version": "PostgreSQL 17.11 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 7.5.0-3ubuntu1~18.04) 7.5.0, 64-bit",
+    "lc_ctype": "en_US.UTF-8"
+  },
+  "browser": "156.0.8078.79",
+  "production_connections": 0,
+  "limitations": [
+    "SQL auth.uid is a local claim stub, not a live Supabase JWT verification",
+    "Browser uses an offline Supabase SDK test double; no live Auth/PostgREST/CDN check",
+    "Synthetic baseline represents supplied schema and selected rows, not a fresh complete production dump"
+  ],
+  "scope": "No production or existing test project contacted. No merge or deployment."
+}
