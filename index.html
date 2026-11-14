@@ -566,7 +566,7 @@
                 const selected = select.value;
                 const values = [...new Set(shirts.map(item => String(item[field] ?? "")))]
                     .filter(value => value.trim() !== "")
-                    .sort(field === "velicina" ? compareSizes : (a, b) => a.localeCompare(b, "bs", { numeric: true }));
+                    .sort((a, b) => compareOrderItems({ [field]: a }, { [field]: b }));
                 select.replaceChildren(new Option(placeholder, ""));
                 values.forEach(value => select.add(new Option(value, value)));
                 select.value = values.includes(selected) ? selected : "";
@@ -582,7 +582,7 @@
                 (!model || String(item.model ?? "") === model) &&
                 (!boja || String(item.boja ?? "") === boja) &&
                 (!velicina || String(item.velicina ?? "") === velicina)
-            );
+            ).sort(compareOrderItems);
 
             const total = shirts.reduce(
                 (sum, item) => sum + Number(item.kolicina || 0), 0
