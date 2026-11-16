@@ -363,7 +363,11 @@
                             <label for="velicina">
                                 Veličina
                             </label>
-                            <input id="velicina" placeholder="Npr. M, L, XL" required="" type="text" />
+                            <input id="velicina" list="velicineSuggestions"
+                                   autocomplete="off"
+                                   placeholder="Npr. M, L, XL ili 152"
+                                   required="" type="text" />
+                            <datalist id="velicineSuggestions"></datalist>
                         </div>
 
                         <div>
@@ -561,6 +565,34 @@
             $("cancelBtn").classList.add("hidden")
         }
 
+function populateVelicineSuggestions() {
+    const datalist = $("velicineSuggestions");
+
+    const standardne = [
+        "XS", "S", "M", "L", "XL", "2XL", "3XL"
+    ];
+
+    const izBaze = shirts
+        .map(item => normalizeSize(item.velicina))
+        .filter(Boolean);
+
+    const velicine = [...new Set([
+        ...standardne,
+        ...izBaze
+    ])];
+
+    datalist.replaceChildren();
+
+    velicine.forEach(velicina => {
+        datalist.appendChild(
+            new Option(velicina, velicina)
+        );
+    });
+}
+
+
+
+        
         function populateModelSuggestions() {
             const datalist = $("modelSuggestions");
 
@@ -805,11 +837,12 @@
                 if (error) throw error;
                 if (revision !== sessionRevision) return;
                 shirts = (data || []).map(normalizeShirt).sort(compareOrderItems);
-                populateFilters();
-                populateModelSuggestions();
-                populateBojeSuggestions();
-                renderShirts();
-                renderDopuna();
+                    populateFilters();
+                    populateModelSuggestions();
+                    populateBojeSuggestions();
+                    populateVelicineSuggestions();
+                    renderShirts();
+                    renderDopuna();
                 setStatus("Podaci su učitani iz online baze.")
             }
             catch (error) {
