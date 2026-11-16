@@ -352,7 +352,9 @@
                             <label for="boja">
                                 Boja
                             </label>
-                            <input id="boja" placeholder="Npr. Crna" required="" type="text" />
+                            <input id="boja" list="bojeSuggestions"
+                                   placeholder="Npr. Crna" required="" type="text" />
+                            <datalist id="bojeSuggestions"></datalist>
                         </div>
                         <div>
                             <label for="velicina">
@@ -556,6 +558,23 @@
             $("cancelBtn").classList.add("hidden")
         }
 
+       function populateBojeSuggestions() {
+            const datalist = $("bojeSuggestions");
+
+            const boje = [...new Set(
+            shirts.map(item => String(item.boja ?? "").trim())
+            .filter(Boolean)
+            )].sort((a, b) => a.localeCompare(b, "bs"));
+
+            datalist.replaceChildren();
+
+            boje.forEach(boja => {
+            datalist.appendChild(new Option(boja, boja));
+            });
+        }
+
+
+        
         function populateFilters() {
             [
                 ["filterModel", "model", "Svi modeli"],
@@ -765,6 +784,7 @@
                 if (revision !== sessionRevision) return;
                 shirts = (data || []).map(normalizeShirt).sort(compareOrderItems);
                 populateFilters();
+                populateBojeSuggestions();
                 renderShirts();
                 renderDopuna();
                 setStatus("Podaci su učitani iz online baze.")
