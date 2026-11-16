@@ -346,7 +346,9 @@
                             <label for="model">
                                 Model majice
                             </label>
-                            <input id="model" placeholder="Npr. Basic" required="" type="text" />
+                            <input id="model" list="modelSuggestions"
+                                   placeholder="Npr. Muška" required="" type="text" />
+                            <datalist id="modelSuggestions"></datalist>
                         </div>
                         <div>
                             <label for="boja">
@@ -558,6 +560,25 @@
             $("cancelBtn").classList.add("hidden")
         }
 
+        function populateModelSuggestions() {
+            const datalist = $("modelSuggestions");
+
+            const modeli = [...new Set(
+            shirts.map(item => normalizeModel(item.model).trim())
+            .filter(Boolean)
+            )].sort((a, b) => a.localeCompare(b, "bs"));
+
+            datalist.replaceChildren();
+
+            modeli.forEach(model => {
+            datalist.appendChild(new Option(model, model));
+            });
+        }
+
+
+
+
+        
        function populateBojeSuggestions() {
             const datalist = $("bojeSuggestions");
 
@@ -784,6 +805,7 @@
                 if (revision !== sessionRevision) return;
                 shirts = (data || []).map(normalizeShirt).sort(compareOrderItems);
                 populateFilters();
+                populateModelSuggestions();
                 populateBojeSuggestions();
                 renderShirts();
                 renderDopuna();
