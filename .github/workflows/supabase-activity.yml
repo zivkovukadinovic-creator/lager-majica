@@ -43,7 +43,7 @@ jobs:
           key = os.environ.get("SUPABASE_ANON_KEY", "")
           if not re.fullmatch(r"https://[a-z0-9]+\.supabase\.co", url):
               fail("Invalid Supabase URL.")
-          if hashlib.sha256(url.encode()).hexdigest() != "167ede07677cb36905b63e5f984b22c18e4a43d2e37aefe83bc92af7a2d3a676":
+          if hashlib.sha256(url.encode()).hexdigest() != "d15aada867f22234f92b229707ba32218577ffa080954fdb42ebc4b985726903":
               fail("URL does not match the reviewed production project.")
           if not re.fullmatch(r"[A-Za-z0-9_.-]{20,4096}", key):
               fail("Missing or invalid public API key.")
