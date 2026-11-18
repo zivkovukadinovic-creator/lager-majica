@@ -1,0 +1,92 @@
+# REVIEW DRAFT: .disabled extension means GitHub cannot execute this file.
+# Renaming or enabling requires the owner's explicit approval.
+name: Supabase read-only activity
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '23 7,15,23 * * *'
+permissions: {}
+concurrency:
+  group: supabase-read-only-activity
+  cancel-in-progress: false
+jobs:
+  activity:
+    if: >-
+      github.repository == 'zivkovukadinovic-creator/lager-majica' &&
+      github.ref == 'refs/heads/main' &&
+      vars.SUPABASE_ACTIVITY_ENABLED == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 2
+    steps:
+      - name: Read-only request with no business data in logs
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PYTHON'
+          import base64
+          import hashlib
+          import json
+          import os
+          import re
+          import sys
+          import urllib.error
+          import urllib.request
+          
+          def fail(message):
+              print(message)
+              raise SystemExit(1)
+          
+          url = os.environ.get("SUPABASE_URL", "")
+          key = os.environ.get("SUPABASE_ANON_KEY", "")
+          if not re.fullmatch(r"https://[a-z0-9]+\.supabase\.co", url):
+              fail("Invalid Supabase URL.")
+          if hashlib.sha256(url.encode()).hexdigest() != "167ede07677cb36905b63e5f984b22c18e4a43d2e37aefe83bc92af7a2d3a676":
+              fail("URL does not match the reviewed production project.")
+          if not re.fullmatch(r"[A-Za-z0-9_.-]{20,4096}", key):
+              fail("Missing or invalid public API key.")
+          if key.startswith("sb_publishable_"):
+              pass
+          else:
+              try:
+                  parts = key.split(".")
+                  if len(parts) != 3:
+                      raise ValueError()
+                  payload = json.loads(base64.urlsafe_b64decode(parts[1] + "=" * (-len(parts[1]) % 4)))
+                  if payload.get("role") != "anon":
+                      raise ValueError()
+              except Exception:
+                  fail("Only a publishable key or legacy anon key is allowed.")
+          # Local role inspection prevents configuration mistakes; Supabase verifies the key.
+          # Deliberately no Authorization user token, RPC call, or write method.
+          class NoRedirect(urllib.request.HTTPRedirectHandler):
+              def redirect_request(self, req, fp, code, msg, headers, newurl):
+                  return None
+          
+          request = urllib.request.Request(
+              url + "/rest/v1/majice?select=id&limit=1",
+              headers={"apikey": key, "Accept": "application/json", "Accept-Profile": "public"},
+              method="GET",
+          )
+          try:
+              with urllib.request.build_opener(NoRedirect()).open(request, timeout=25) as response:
+                  if response.status != 200:
+                      fail("Unexpected HTTP status.")
+                  body = response.read(1025)
+                  if len(body) > 1024:
+                      fail("Unexpected response size; body withheld.")
+                  if json.loads(body) != []:
+                      fail("Anonymous response is not empty; review RLS. Body withheld.")
+          except urllib.error.HTTPError as error:
+              fail("Read-only request failed (HTTP " + str(error.code) + "). No retry.")
+          except (urllib.error.URLError, TimeoutError):
+              fail("Network or TLS failure. No retry.")
+          except (ValueError, UnicodeError):
+              fail("Invalid JSON response; body withheld.")
+          except Exception:
+              fail("Read-only request failed; details withheld.")
+          print("Read-only request succeeded; anonymous response is empty.")
+          
+          PYTHON
